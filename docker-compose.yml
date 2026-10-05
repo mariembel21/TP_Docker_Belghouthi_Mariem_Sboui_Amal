@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  # Service Base de données Redis
+  db-service:
+    image: redis:alpine
+    container_name: db-service
+    volumes:
+      - redis-data:/data
+    networks:
+      - app-network
+    restart: always
+
+  # Service Application Web Python
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${WEB_PORT}:5000"
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+    networks:
+      - app-network
+    depends_on:
+      - db-service
+
+# Déclaration du volume persistant
+volumes:
+  redis-data:
+    name: redis-data
+
+# Déclaration du réseau
+networks:
+  app-network:
+    name: app-network
+  
